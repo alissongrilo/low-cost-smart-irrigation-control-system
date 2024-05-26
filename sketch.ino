@@ -3,7 +3,6 @@
 #include <ArduinoJson.h>
 #include "DHTesp.h"
 
-
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 const char* ssid = "Wokwi-GUEST";
 const char* password = "";
@@ -14,6 +13,9 @@ PubSubClient client(espClient);
 long lastTime = 0;
 
 const int DHT_PIN = 15;
+const int POT_PIN = 34;
+const int LED_PIN = 2;
+
 DHTesp dhtSensor;
 
 void setup_wifi() {
@@ -37,7 +39,6 @@ void setup_humidity_temperature_sensor() {
 }
 
 void callback(String topic, byte* payload, unsigned int length) {
-
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
@@ -47,8 +48,6 @@ void callback(String topic, byte* payload, unsigned int length) {
   }
 
   Serial.println(strPayload);
-
-
   Serial.println();
 }
 
@@ -74,10 +73,10 @@ void setup() {
   Serial.println("\n Start Setup");
   setup_wifi();
   setup_humidity_temperature_sensor();
+  pinMode(LED_PIN, OUTPUT);
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 }
-
 
 void loop() {
   while (WiFi.status() != WL_CONNECTED) {
@@ -92,11 +91,16 @@ void loop() {
   if (now - lastTime > 1000) {
     lastTime = now;
 
+    int value = analogRead(POT_PIN);
+    int intensity = map(value, 0, 4095, 0, 255);
+    analogWrite(LED_PIN, intensity);
+
     TempAndHumidity data = dhtSensor.getTempAndHumidity();
 
     StaticJsonDocument<200> jsonDoc;
     jsonDoc["temperature"] = data.temperature;
     jsonDoc["airHumidity"] = data.humidity;
+    jsonDoc["soilMoisture"] = intensity;
 
     char jsonBuffer[256];
     serializeJson(jsonDoc, jsonBuffer);
