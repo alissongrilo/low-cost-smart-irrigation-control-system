@@ -3,19 +3,51 @@
   "author": "Uri Shaked",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": -91.3, "left": 14.2, "attrs": {} },
-    { "type": "wokwi-dht22", "id": "dht1", "top": -57.3, "left": 186.6, "attrs": {} },
-    { "type": "wokwi-potentiometer", "id": "pot1", "top": -58.9, "left": -125, "attrs": {} }
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": -66.9,
+      "left": 148.2,
+      "attrs": { "temperature": "51.6" }
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht2",
+      "top": -66.9,
+      "left": 234.6,
+      "attrs": { "temperature": "51.6" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 110.4,
+      "left": 143.45,
+      "rotate": 90,
+      "attrs": { "value": "4700" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 110.4,
+      "left": 229.85,
+      "rotate": 90,
+      "attrs": { "value": "4700" }
+    }
   ],
   "connections": [
     [ "esp:TX0", "$serialMonitor:RX", "", [] ],
     [ "esp:RX0", "$serialMonitor:TX", "", [] ],
-    [ "dht1:SDA", "esp:D15", "green", [ "h0.1", "v-9.4" ] ],
-    [ "dht1:VCC", "esp:3V3", "red", [ "v9.6", "h-76.5" ] ],
-    [ "dht1:GND", "esp:GND.1", "black", [ "v19.2", "h-67.2", "v-38.3" ] ],
-    [ "pot1:GND", "esp:GND.2", "black", [ "v48", "h76.8", "v0.1" ] ],
-    [ "pot1:SIG", "esp:A2", "green", [ "v112.27", "h116.63" ] ],
-    [ "pot1:VCC", "esp:VIN", "red", [ "v130.27", "h73.3", "v-25.33" ] ]
+    [ "dht1:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "dht1:GND", "esp:GND.1", "black", [ "v0" ] ],
+    [ "esp:D18", "dht1:SDA", "green", [ "h0" ] ],
+    [ "dht2:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "dht2:GND", "esp:GND.1", "black", [ "v0" ] ],
+    [ "esp:D19", "dht2:SDA", "green", [ "h0" ] ],
+    [ "dht1:SDA", "r1:1", "green", [ "v0" ] ],
+    [ "dht2:SDA", "r2:1", "green", [ "v0" ] ],
+    [ "r1:2", "esp:3V3", "red", [ "h0", "v27.6" ] ],
+    [ "r2:2", "esp:3V3", "red", [ "h0", "v27.6" ] ]
   ],
   "dependencies": {}
 }

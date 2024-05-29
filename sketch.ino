@@ -12,11 +12,13 @@ PubSubClient client(espClient);
 
 long lastTime = 0;
 
-const int DHT_PIN = 15;
-const int POT_PIN = 34;
+const int DHT_PIN1 = 18;
+const int DHT_PIN2 = 19;
+
 const int LED_PIN = 2;
 
-DHTesp dhtSensor;
+DHTesp dhtSensor1;
+DHTesp dhtSensor2;
 
 void setup_wifi() {
   Serial.println("Starting Setup Wifi");
@@ -35,7 +37,8 @@ void setup_wifi() {
 }
 
 void setup_humidity_temperature_sensor() {
-  dhtSensor.setup(DHT_PIN, DHTesp::DHT22);
+  dhtSensor1.setup(DHT_PIN1, DHTesp::DHT22);
+  dhtSensor2.setup(DHT_PIN2, DHTesp::DHT22);
 }
 
 void callback(String topic, byte* payload, unsigned int length) {
@@ -69,11 +72,10 @@ void reconnect() {
 }
 
 void setup() {
-  Serial.begin(115200);
   Serial.println("\n Start Setup");
+  Serial.begin(115200);
   setup_wifi();
   setup_humidity_temperature_sensor();
-  pinMode(LED_PIN, OUTPUT);
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 }
@@ -88,19 +90,17 @@ void loop() {
   }
   client.loop();
   long now = millis();
+  
   if (now - lastTime > 1000) {
     lastTime = now;
 
-    int value = analogRead(POT_PIN);
-    int intensity = map(value, 0, 4095, 0, 255);
-    analogWrite(LED_PIN, intensity);
-
-    TempAndHumidity data = dhtSensor.getTempAndHumidity();
+    TempAndHumidity data1 = dhtSensor1.getTempAndHumidity();
+    TempAndHumidity data2 = dhtSensor2.getTempAndHumidity();
 
     StaticJsonDocument<200> jsonDoc;
-    jsonDoc["temperature"] = data.temperature;
-    jsonDoc["airHumidity"] = data.humidity;
-    jsonDoc["soilMoisture"] = intensity;
+    jsonDoc["temperature"] = data1.temperature;
+    jsonDoc["airHumidity"] = data1.humidity;
+    jsonDoc["soilMoisture"] = data2.humidity;
 
     char jsonBuffer[256];
     serializeJson(jsonDoc, jsonBuffer);
