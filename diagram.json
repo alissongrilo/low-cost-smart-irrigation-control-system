@@ -9,14 +9,14 @@
       "id": "dht1",
       "top": -66.9,
       "left": 148.2,
-      "attrs": { "temperature": "51.6" }
+      "attrs": { "temperature": "51.6", "humidity": "88.5" }
     },
     {
       "type": "wokwi-dht22",
       "id": "dht2",
       "top": -66.9,
       "left": 234.6,
-      "attrs": { "temperature": "51.6" }
+      "attrs": { "temperature": "51.6", "humidity": "0" }
     },
     {
       "type": "wokwi-resistor",
@@ -33,6 +33,15 @@
       "left": 229.85,
       "rotate": 90,
       "attrs": { "value": "4700" }
+    },
+    { "type": "wokwi-led", "id": "led1", "top": 6, "left": -73, "attrs": { "color": "red" } },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 91.2,
+      "left": -77.35,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
     }
   ],
   "connections": [
@@ -47,7 +56,10 @@
     [ "dht1:SDA", "r1:1", "green", [ "v0" ] ],
     [ "dht2:SDA", "r2:1", "green", [ "v0" ] ],
     [ "r1:2", "esp:3V3", "red", [ "h0", "v27.6" ] ],
-    [ "r2:2", "esp:3V3", "red", [ "h0", "v27.6" ] ]
+    [ "r2:2", "esp:3V3", "red", [ "h0", "v27.6" ] ],
+    [ "led1:C", "esp:GND.2", "green", [ "v0" ] ],
+    [ "led1:A", "r3:1", "green", [ "v0" ] ],
+    [ "r3:2", "esp:D12", "green", [ "h0" ] ]
   ],
   "dependencies": {}
 }

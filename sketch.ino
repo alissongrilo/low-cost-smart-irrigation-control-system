@@ -15,7 +15,7 @@ long lastTime = 0;
 const int DHT_PIN1 = 18;
 const int DHT_PIN2 = 19;
 
-const int LED_PIN = 2;
+const int LED_PIN = 12;
 
 DHTesp dhtSensor1;
 DHTesp dhtSensor2;
@@ -50,7 +50,25 @@ void callback(String topic, byte* payload, unsigned int length) {
     strPayload = strPayload + (char)payload[i];
   }
 
-  Serial.println(strPayload);
+  StaticJsonDocument<200> doc;
+  DeserializationError error = deserializeJson(doc, strPayload);
+
+  if (error) {
+    Serial.print("deserializeJson() failed: ");
+    Serial.println(error.c_str());
+    return;
+  }
+
+  bool waterStatus = doc["waterStatus"];
+  Serial.print("waterStatus: ");
+  Serial.println(waterStatus);
+
+  if (waterStatus) {
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+  }
+
   Serial.println();
 }
 
@@ -61,7 +79,7 @@ void reconnect() {
     clientId += String(random(0xffff), HEX);
     if (client.connect(clientId.c_str())) {
       Serial.println("connected to the Broker");
-      client.subscribe("IPB/IoT/Projeto/Alisson_Joao/Planta");
+      client.subscribe("IPB/IoT/Projeto/Alisson_Joao/WaterStatus");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -73,7 +91,8 @@ void reconnect() {
 
 void setup() {
   Serial.println("\n Start Setup");
-  Serial.begin(115200);
+  Serial.begin(9600);
+  pinMode(LED_PIN, OUTPUT);
   setup_wifi();
   setup_humidity_temperature_sensor();
   client.setServer(mqtt_server, 1883);
